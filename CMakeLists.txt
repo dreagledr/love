@@ -1587,6 +1587,18 @@ add_library(love_3p_lua53 ${LOVE_SRC_3P_LUA53})
 target_link_libraries(love_3p_lua53 ${LOVE_LUA_LIBRARY})
 
 #
+# emfetch (Emscripten Fetch API bridge, exposes the "http" Lua module)
+#
+
+set(LOVE_SRC_3P_EMFETCH
+	src/libraries/emfetch/emfetch.cpp
+	src/libraries/emfetch/emfetch.h
+)
+
+add_library(love_3p_emfetch ${LOVE_SRC_3P_EMFETCH})
+target_link_libraries(love_3p_emfetch ${LOVE_LUA_LIBRARY})
+
+#
 # lz4
 #
 
@@ -1728,6 +1740,7 @@ add_library(love_3p_xxhash ${LOVE_SRC_3P_XXHASH})
 set(LOVE_3P
 	love_3p_box2d
 	love_3p_ddsparse
+	love_3p_emfetch
 	love_3p_enet
 	love_3p_glad
 	love_3p_glslang
@@ -1838,6 +1851,7 @@ if(EMSCRIPTEN)
 		"-s DISABLE_EXCEPTION_CATCHING=0" # Might be worth building a whitelist for EXCEPTION_CATCHING_WHITELIST
 		"-s ALLOW_MEMORY_GROWTH=1" # for dynamic resizing of memory, should not have a performance impact as using WASM
 		"-s FORCE_FILESYSTEM=1" # to fix Module.addDependency not existing
+		"-s FETCH=1" # Emscripten Fetch API (used by the emfetch "http" module)
 		"-lidbfs.js" # to fix the ReferenceError: IDBFS is not defined
         "-lwebsocket.js" # websocket API
 	)

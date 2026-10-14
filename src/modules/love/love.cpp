@@ -66,6 +66,9 @@
 #ifdef LOVE_ENABLE_LUA53
 #	include "libraries/lua53/lutf8lib.h"
 #endif
+#ifdef __EMSCRIPTEN__
+#	include "libraries/emfetch/emfetch.h"
+#endif
 
 // For love::graphics::setGammaCorrect.
 #ifdef LOVE_ENABLE_GRAPHICS
@@ -527,6 +530,9 @@ int luaopen_love(lua_State *L)
 #endif
 #ifdef LOVE_ENABLE_LUA53
 	love::luax_preload(L, luaopen_luautf8, "utf8");
+#endif
+#ifdef __EMSCRIPTEN__
+	love::luax_preload(L, luaopen_emfetch, "http");
 #endif
 
 #ifdef LOVE_ENABLE_WINDOW
