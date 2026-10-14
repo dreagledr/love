@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2006-2022 LOVE Development Team
+ * Copyright (c) 2006-2023 LOVE Development Team
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -30,9 +30,12 @@
 // C++
 #include <algorithm>
 #include <iostream>
+#include <cstdint>
 #include <cstdio>
 #include <cstddef>
 #include <cmath>
+#include <limits>
+#include <cstring>
 #include <sstream>
 
 // VS2013 doesn't support alignof
@@ -105,6 +108,10 @@ static bool luax_isfulllightuserdatasupported(lua_State *L)
 	static bool checked = false;
 	static bool supported = false;
 
+	if (sizeof(void*) == 4)
+		// 32-bit platforms always supports full-lightuserdata.
+		return true;
+
 	if (!checked)
 	{
 		lua_pushcclosure(L, [](lua_State *L) -> int
@@ -160,14 +167,13 @@ static ObjectKey luax_computeloveobjectkey(lua_State *L, love::Object *object)
 	if ((key & (minalign - 1)) != 0)
 	{
 		luaL_error(L, "Cannot push love object to Lua: unexpected alignment "
-				   "(pointer is %p but alignment should be %d)", object, minalign);
+				   "(pointer is %p but alignment should be %d)", object, (int) minalign);
 	}
   key = (key & 0xC000000000000000ULL) ^ 0x4000000000000000ULL;
 	key |= ((uint64_t)object >> 1) & 0x3FFFFFFFFFFFFFFFULL;
 	ObjectKey fkey;
 	memcpy(&fkey, &key, sizeof(fkey));
         return fkey;
-	// return (ObjectKey) key;
 }
 
 static void luax_pushloveobjectkey(lua_State *L, ObjectKey key)
